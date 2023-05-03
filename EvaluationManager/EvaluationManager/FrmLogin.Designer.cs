@@ -1,6 +1,6 @@
 ﻿namespace EvaluationManager
 {
-    partial class Form1
+    partial class FrmLogin
     {
         /// <summary>
         /// Required designer variable.
