@@ -16,5 +16,17 @@ namespace EvaluationManager
         {
             InitializeComponent();
         }
+
+        private void FrmStudents_Load(object sender, EventArgs e)
+        {
+            ShowStudents();
+        }
+
+        private void ShowStudents()
+        {
+            StudentRepository repository = new StudentRepository();
+            List<Student> students = repository.GetStudents();
+            dgvStudents.DataSource = students;
+        }
     }
 }
