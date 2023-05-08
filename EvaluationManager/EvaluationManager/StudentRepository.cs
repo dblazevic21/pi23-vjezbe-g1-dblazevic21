@@ -46,7 +46,7 @@ namespace EvaluationManager
             SqlDataReader reader = DB.GetDataReader($"SELECT * FROM Students");
             while (reader.Read())
             {
-                Student student = new Student();
+                Student student;
                 student = CreateObject(reader);
                 studenti.Add(student);
             }
