@@ -10,7 +10,7 @@ namespace EvaluationManager
 {
     public class StudentRepository
     {
-        private Student CreateObject(SqlDataReader reader)
+        private static Student CreateObject(SqlDataReader reader)
         {
             Student student = new Student();
             student.Id = Convert.ToInt32(reader["Id"].ToString());
@@ -22,7 +22,7 @@ namespace EvaluationManager
 
             return student;
         }
-        public Student GetStudent(int id)
+        public static Student GetStudent(int id)
         {
             Student student = null;
             DB.OpenConnection();
@@ -52,6 +52,7 @@ namespace EvaluationManager
             }
             reader.Close();
             DB.CloseConnection();
+
 
             return studenti;
         }

@@ -27,7 +27,7 @@ namespace EvaluationManager
 
             return aktivnost;
         }
-        public static Activity GetObject(int id)
+        public static Activity GetActivity(int id)
         {
             Activity activity= null;
             DB.OpenConnection();

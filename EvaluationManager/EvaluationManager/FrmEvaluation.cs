@@ -50,11 +50,36 @@ namespace EvaluationManager
 
                 numPoints.Minimum = 0;
                 numPoints.Maximum = selectedActivity.MaxPoints;
+
+                var evaluation = EvaluationRepository.GetEvaluation(selectedStudent, selectedActivity);
+                if(evaluation != null)
+                {
+                    txtTeacher.Text = evaluation.Evaluator.ToString();
+                    txtEvaluationDate.Text = evaluation.EvaluationDate.ToString();
+                    numPoints.Value = evaluation.Points;
+                }
+                else
+                {
+                    txtTeacher.Text = FrmLogin.LoggedTeacher.ToString();
+                    txtEvaluationDate.Text = "-";
+                    numPoints.Value = 0;
+                }
             } 
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
+            Close();
+        }
+
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            var activity = cboActivities.SelectedItem as Activity;
+            var teacher = FrmLogin.LoggedTeacher;
+            int points = (int)numPoints.Value;
+
+            teacher.PerformEvaluation(selectedStudent, activity, points);
             Close();
         }
     }
