@@ -14,6 +14,10 @@ namespace EvaluationManager {
             InitializeComponent();
         }
 
+        private void btnClose_Click(object sender, EventArgs e) {
+            Close();
+        }
+
         private List<StudentReportView> GenerateStudentReport() {
             var allStudents = StudentRepository.GetStudents();
             List<StudentReportView> examReports = new List<StudentReportView>();
@@ -36,8 +40,6 @@ namespace EvaluationManager {
 
         }
 
-        private void btnClose_Click(object sender, EventArgs e) {
-            Close();
-        }
+        
     }
 }
