@@ -1,0 +1,454 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Drawing.Text;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace EvaluationManager
+{
+    public partial class FrmFinalReport : Form
+    {
+        public FrmFinalReport()
+        {
+            InitializeComponent();
+        }
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private List<StudentReportView> GenerateStudentReport()
+        {
+            var allStudents = StudentRepository.GetStudents();
+            List<StudentReportView> examReports = new List<StudentReportView>();
+
+            foreach (var student in allStudents)
+            {
+                if (student.HasSignature())
+                {
+                    var examReport = new StudentReportView(student);
+                    examReports.Add(examReport);
+                }
+            }
+            return examReports;
+        }
+
+        private void FrmFinalReport_Load(object sender, EventArgs e)
+        {
+            
+
+
+            var results = GenerateStudentReport();
+            dgvRestults.DataSource = results;
+
+
+        }
+    }
+}
+
+
+_______________________________
+
+
+namespace EvaluationManager
+{
+    partial class FrmFinalReport
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            this.dgvRestults = new System.Windows.Forms.DataGridView();
+            this.btnClose = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvRestults)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // dgvRestults
+            // 
+            this.dgvRestults.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvRestults.Location = new System.Drawing.Point(12, 12);
+            this.dgvRestults.Name = "dgvRestults";
+            this.dgvRestults.Size = new System.Drawing.Size(776, 371);
+            this.dgvRestults.TabIndex = 0;
+            // 
+            // btnClose
+            // 
+            this.btnClose.Location = new System.Drawing.Point(713, 406);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(75, 23);
+            this.btnClose.TabIndex = 1;
+            this.btnClose.Text = "Zatvori";
+            this.btnClose.UseVisualStyleBackColor = true;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            // 
+            // FrmFinalReport
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnClose);
+            this.Controls.Add(this.dgvRestults);
+            this.Name = "FrmFinalReport";
+            this.Text = "FrmFinalReport";
+            this.Load += new System.EventHandler(this.FrmFinalReport_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.dgvRestults)).EndInit();
+            this.ResumeLayout(false);
+
+        }
+
+        #endregion
+
+        private System.Windows.Forms.DataGridView dgvRestults;
+        private System.Windows.Forms.Button btnClose;
+    }
+}
+
+
+______________________________________________
+
+
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using DBLayer;
+
+namespace EvaluationManager
+{
+    public class StudentReportView
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+
+        public string K1 { get; set; }
+        public string K2 { get; set; }
+        public string Z1 { get; set; }
+        public string Z2 { get; set; }
+        public string Z3 { get; set; }
+
+        public string HasSignature { get; set; }
+        public string HasGrade { get; set; }
+        public int TotalPoints { get; set; }
+        public int Grade { get; set; }
+
+        public StudentReportView(Student student)
+        {
+            FirstName = student.FirstName;
+            LastName = student.LastName;
+
+            HasSignature = student.HasSignature() ? "DA" : "NE";
+            HasGrade = student.HasGrade() ? "DA" : "NE";
+
+            TotalPoints = student.CalculateTotalPoints();
+            Grade = student.CalculateGrade();
+
+            var evaluations = student.GetEvaluations();
+
+            var kolokvij1 = evaluations.FirstOrDefault(e => e.Activity.Name == "Kolokvij 1");
+            var kolokvij2 = evaluations.FirstOrDefault(e => e.Activity.Name == "Kolokvij 2");
+            var zadaca1 = evaluations.FirstOrDefault(e => e.Activity.Name == "Zadaca 1");
+            var zadaca2 = evaluations.FirstOrDefault(e => e.Activity.Name == "Zadaca 2");
+
+            var zadaca3 = evaluations.FirstOrDefault(e => e.Activity.Name == "Zadaca 3");
+
+
+            K1 = kolokvij1 == null ? "-" : kolokvij1.Points.ToString();
+            K2 = kolokvij2 == null ? "-" : kolokvij2.Points.ToString();
+            K1 = zadaca1 == null ? "-" : zadaca1.Points.ToString();
+            K1 = zadaca2 == null ? "-" : zadaca2.Points.ToString();
+            K1 = zadaca3 == null ? "-" : zadaca3.Points.ToString();
+
+
+
+        }
+
+
+    }
+}
+
+
+
+
+
+_________________________
+
+
+
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using DBLayer;
+
+namespace EvaluationManager
+{
+    public class StudentRepository
+    {
+        private static Student CreateObject(SqlDataReader reader)
+        {
+            Student student = new Student();
+            student.Id = Convert.ToInt32(reader["Id"].ToString());
+            student.FirstName = reader["FirstName"].ToString();
+            student.LastName = reader["LastName"].ToString();
+
+            int.TryParse(reader["Grade"].ToString(), out int grade);
+            student.Grade = grade;
+
+            return student;
+        }
+        public static Student GetStudent(int id)
+        {
+            Student student = null;
+            DB.OpenConnection();
+            SqlDataReader reader = DB.GetDataReader($"SELECT * FROM Students WHERE Id = {id}");
+            if (reader.HasRows)
+            {
+                reader.Read();
+                student = CreateObject(reader);
+                reader.Close();
+            }
+
+            DB.CloseConnection();
+
+            return student;
+        }
+        public List<Student> GetStudents()
+        {
+            List<Student> studenti = new List<Student>();
+
+            DB.OpenConnection();
+            SqlDataReader reader = DB.GetDataReader($"SELECT * FROM Students");
+            while (reader.Read())
+            {
+                Student student;
+                student = CreateObject(reader);
+                studenti.Add(student);
+            }
+            reader.Close();
+            DB.CloseConnection();
+
+
+            return studenti;
+        }
+    }  
+}
+
+
+
+_______________________________________________
+
+
+
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace EvaluationManager
+{
+    public class Student : Person
+    {
+        public int Grade { get; set; }
+
+        public List<Evaluation> GetEvaluations()
+        {
+            return EvaluationRepository.GetEvaluations(this);
+        }
+        public int CalculateTotalPoints()
+        {
+            int totalPoints = 0;
+            foreach (var evaluation in GetEvaluations())
+            {
+                totalPoints += evaluation.Points;
+            }
+            return totalPoints;
+        }
+
+        private bool IsEvaluationComplete()
+        {
+            var evaluations = GetEvaluations();
+            var activities = ActivityRepository.GetActivities();
+            return evaluations.Count == activities.Count;
+        }
+        public bool HasSignature()
+        {
+            bool hasSignature = true;
+            if (IsEvaluationComplete())
+            {
+                foreach (var evaluation in GetEvaluations())
+                {
+                    if (!evaluation.IsSufficientForSignature())
+                    {
+                        hasSignature = false;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                hasSignature = false;
+            }
+            return hasSignature;
+        }
+
+        public bool HasGrade()
+        {
+            bool hasGrade = true;
+            if (IsEvaluationComplete())
+            {
+                foreach (var evaluation in GetEvaluations())
+                {
+                    if (!evaluation.IsSufficientForGrade())
+                    {
+                        hasGrade = false;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                hasGrade = false;
+            }
+            return hasGrade;
+        }
+
+        public int CalculateGrade()
+        {
+            int grade = 0;
+            if (HasGrade())
+            {
+                int totalPoints = CalculateTotalPoints();
+                if (totalPoints >= 91)
+                {
+                    grade = 5;
+                }
+                else if (totalPoints >= 76)
+                {
+                    grade = 4;
+                }
+                else if (totalPoints >= 61)
+                {
+                    grade = 3;
+                }
+                else if (totalPoints >= 50)
+                {
+                    grade = 2;
+                }
+                else
+                {
+                    grade = 1;
+                }
+            }
+            return grade;
+        }
+
+
+    }
+}
+
+
+
+
+___________________________________
+
+
+
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using DBLayer;
+
+namespace EvaluationManager
+{
+    public class StudentRepository
+    {
+        private static Student CreateObject(SqlDataReader reader)
+        {
+            Student student = new Student();
+            student.Id = Convert.ToInt32(reader["Id"].ToString());
+            student.FirstName = reader["FirstName"].ToString();
+            student.LastName = reader["LastName"].ToString();
+
+            int.TryParse(reader["Grade"].ToString(), out int grade);
+            student.Grade = grade;
+
+            return student;
+        }
+        public static Student GetStudent(int id)
+        {
+            Student student = null;
+            DB.OpenConnection();
+            SqlDataReader reader = DB.GetDataReader($"SELECT * FROM Students WHERE Id = {id}");
+            if (reader.HasRows)
+            {
+                reader.Read();
+                student = CreateObject(reader);
+                reader.Close();
+            }
+
+            DB.CloseConnection();
+
+            return student;
+        }
+        public static List<Student> GetStudents()
+        {
+            List<Student> studenti = new List<Student>();
+
+            DB.OpenConnection();
+            SqlDataReader reader = DB.GetDataReader($"SELECT * FROM Students");
+            while (reader.Read())
+            {
+                Student student;
+                student = CreateObject(reader);
+                studenti.Add(student);
+            }
+            reader.Close();
+            DB.CloseConnection();
+
+
+            return studenti;
+        }
+    }  
+}
+
+
+
